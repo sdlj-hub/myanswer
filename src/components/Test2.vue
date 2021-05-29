@@ -185,6 +185,7 @@ export default {
       this.currentListData = this.getRandomTitle(listData, this.count);
       this.reGo();
       this.currenQuestion = 0;
+      this.falseTitel=[];
       this.totle = 0;
       this.radiograde = 0;
       this.getDatas();

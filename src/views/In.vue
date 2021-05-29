@@ -4,7 +4,7 @@
       <el-header><h1>简易小题库</h1></el-header>
       <el-main>
           <div class="b1"><router-link to="/test1"><el-button type="primary">单选题</el-button></router-link><br/></div>
-         <div class="b1"> <router-link to="/test2"><el-button type="primary">多选题</el-button></router-link><br/></div>
+        <div class="b1"> <router-link to="/test2"><el-button type="primary">多选题</el-button></router-link><br/></div>
          <div class="b1"> <router-link to="/test3"><el-button type="primary">判断题</el-button></router-link><br/></div>
           <div class="b1"><router-link to="/test4"><el-button type="primary">填空题</el-button></router-link><br/></div>
       
