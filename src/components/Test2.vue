@@ -150,6 +150,11 @@ export default {
     truebutton: function () {
       var userAnswer = this.checkList;      //用户输入的答案集合
       var reAnswer = this.an.answer;        //传入的正确答案
+      //保证重新开始，错误题目回顾
+          if((this.currenQuestion + 1)==1){
+            this.falseTitel=[];
+          }
+
       let result =this.JudgeResult(userAnswer,reAnswer);
       if(this.checkList.length >0){
           if (result) {
@@ -185,7 +190,6 @@ export default {
       this.currentListData = this.getRandomTitle(listData, this.count);
       this.reGo();
       this.currenQuestion = 0;
-      this.falseTitel=[];
       this.totle = 0;
       this.radiograde = 0;
       this.getDatas();

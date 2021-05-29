@@ -148,10 +148,17 @@ export default {
     truebutton: function () {
       var userAnswer =parseInt(this.answer);      //用户输入的答案集合
       var reAnswer = this.an.answer;        //传入的正确答案
+
+       //保证重新开始，错误题目回顾
+          if((this.currenQuestion + 1)==1){
+            this.falseTitel=[];
+          }
+
       if(this.answer !=3){      //先保证当答案为空时，不被判为错题进入错题题库
           if (userAnswer == reAnswer) {
             this.radiograde++;
             }else{
+              
             this.falseTitel.push(this.currentListData[this.currenQuestion]);
              }
       }
@@ -187,7 +194,6 @@ export default {
       this.currentListData = this.getRandomTitle(listData, this.count);
       this.reGo();
       this.currenQuestion = 0;
-      this.falseTitel=[];
       this.totle = 0;
       this.radiograde = 0;
       this.getDatas();

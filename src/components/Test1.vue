@@ -160,6 +160,12 @@ export default {
     truebutton: function () {
       var userAnswer = this.answer;
       var reAnswer = this.an.answer;
+
+      //保证重新开始，错误题目回顾
+          if((this.currenQuestion + 1)==1){
+            this.falseTitel=[];
+          }
+
       if(this.answer !=5){
         if (userAnswer == reAnswer) {
         this.radiograde++;
@@ -193,7 +199,6 @@ export default {
       this.currentListData = this.getRandomTitle(listData, this.count);
       this.reGo();
       this.currenQuestion = 0;
-      this.falseTitel=[];
       this.totle = 0;
       this.radiograde = 0;
       this.getDatas();
