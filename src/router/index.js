@@ -1,34 +1,34 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Test from '../components/Test.vue'
-import Test1 from '../components/Test1.vue'
-import Test2 from '../components/Test2.vue'
-import Test3 from '../components/Test3.vue'
-import Test4 from '../components/Test4.vue'
-import Index from '../views/In.vue'
+import Radio from '../components/Radio.vue'
+import Checkbox from '../components/Checkbox.vue'
+import Judge from '../components/Judge.vue'
+import Tiankong from '../components/Tiankong.vue'
+import Index from '../views/Index.vue'
+import Indata from '../views/indata.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
-  // {
-  //  path:'/test',
-  //  component:Test
-  // },
   {
-    path: '/test1',
-    component:Test1
+    path: '/radio',
+    component:Radio
   },
   {
-    path: '/test2',
-    component: Test2
+    path: '/checkbox',
+    component: Checkbox
   },
   {
-    path: '/test3',
-    component: Test3
+    path: '/judge',
+    component: Judge
   },
   {
-    path: '/test4',
-    component: Test4
+    path: '/tiankong',
+    component: Tiankong
+  },
+  {
+    path: '/add',
+    component: Indata
   },
   {
     path: '/index',

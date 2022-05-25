@@ -41,8 +41,6 @@
   </div>
 </template>
 <script>
-import {listData} from '../datas/data';
-
 export default {
   data() {
     return {

@@ -1,25 +1,21 @@
 <template>
   <div class="bigdiv">
-    <h3>测试</h3><span>{{getCurrentTime}}</span>
+    <h3>简易小题库</h3><span>{{getCurrentTime}}</span>
     <el-card>
       <el-container>
         <el-header>
-          <div>单选题</div>
+          <div>多选题</div>
           <div class="title">
             <span>{{ this.currenQuestion + 1 }}、{{ an.title }}</span>
           </div>
         </el-header>
         <el-main class="main">
           <div class="op">
-            <el-radio-group v-model="radio" @change="select">
-              <div
-                v-for="(item, index) in an.option"
-                :key="index"
-                class="radios"
-              >
-                <el-radio :label="index">{{ item }}</el-radio>
-              </div>
-            </el-radio-group>
+            <el-checkbox-group v-model="checkList">
+               <div v-for="(item,index) in an.option" :key="index">
+                    <el-checkbox  :label="index" >{{item}}</el-checkbox>
+               </div>
+            </el-checkbox-group>
           </div>
         </el-main>
         <el-footer>
@@ -48,7 +44,7 @@
     <!-- 结果展示 -->
 
     <el-dialog title="成绩结果" :visible.sync="dialogVisible" width="80%" @closed="closeback">
-      <span>本次单选成绩为：{{ this.radiograde * 1 }}分</span>
+      <span>本次多选成绩为：{{ this.radiograde * 2 }}分</span>
       <span slot="footer" class="dialog-footer">
         <router-link to="/index"><el-button round >返回主页</el-button></router-link>
         <el-button @click="AllRegame">重新挑战</el-button>
@@ -58,8 +54,9 @@
 
     <!-- 查看答案 -->
     <el-dialog title="查看答案" :visible.sync="answerDialogVisible" width="30%">
-      <span>答案: 
-        {{this.an.option[this.an.answer]}}</span>
+      答案: <span v-for="(item,index) in this.currentAnswer" :key="index">
+           {{item}}<span style="color:red">、</span><br/>
+          </span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="answerDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="answerDialogVisible = false">确 定</el-button>
@@ -78,7 +75,7 @@
           B.{{item.option[1]}}<br/>
           C.{{item.option[2]}}<br/>
           D.{{item.option[3]}}<br/>
-          答案 :  {{item.option[item.answer]}}<br/>
+          答案 : <span style="color:red" v-for="(items,index) in item.answer" :key="index"> {{item.option[items]}}、<br/></span><br/>
           <br/>
           <br/>
         </div>
@@ -88,11 +85,10 @@
         <el-button type="primary" @click="reFalseTitle">重新开始</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 <script>
-import { listData } from "../datas/data";
+// import {listData} from '../datas/twoData'
 
 export default {
   data() {
@@ -105,14 +101,16 @@ export default {
       an: {
         title: "",
         option: [],
-        answer: "",
+        answer: [],
       },
+      //当前选项
+      currentoption:[],
+      //选择的选项
+      checkList:[],
+      //本次题目答案：
+      currentAnswer: [],
       //本次错题数组
       falseTitel: [],
-      //单选绑定
-      radio: 5,
-      //初始化答案
-      answer: 5,
       //单选选对提数
       radiograde: 0,
       //当前题数
@@ -126,13 +124,16 @@ export default {
       //本次错题展示窗口
       falseDialogVisible: false,
       //抽取的题数
-      count: 30,
+      count: 15,
       //时间
       time:Date.now()
     };
   },
   created() {
-    this.currentListData = this.getRandomTitle(listData, this.count);
+    this.listData=this.$store.state.usertitle.checkboxList;   //添加
+    this.count=this.$store.state.checkbox.checkboxcount;
+    this.noneListWarn();
+    this.currentListData = this.getRandomTitle(this.listData, this.count);
     this.getDatas();
 
      var that =this;
@@ -141,41 +142,81 @@ export default {
         },1000)
   },
   methods: {
+     //未上传题库
+    noneListWarn: function(){
+      if(this.listData.length==0){
+        alert('请添加多选题库哦');
+        this.$router.push("/index");
+        return;
+      }
+    },
+
     getDatas: async function () {
+      if(this.listData.length!=0){
       //获取题数变化
       var currentnum = this.currenQuestion;
-      this.an.title = this.currentListData[currentnum].title;
-      this.an.option = this.currentListData[currentnum].option;
-      this.an.answer = this.currentListData[currentnum].answer;
+      //初始化选项
+       this.potdata(currentnum);
 
+      this.an.title = this.currentListData[currentnum].title;
+      this.an.option = this.currentoption;
+      this.an.answer= this.potanswer(currentnum);
       //获取总提数
       this.totle = this.currentListData.length;
+      }
+    },    
+ //封装题目选项
+    potdata:function(currentnum){
+      //定义选项数组
+      this.currentoption=[this.currentListData[currentnum].A, this.currentListData[currentnum].B, this.currentListData[currentnum].C,this.currentListData[currentnum].D]
+    },
+    //封装答案
+    potanswer: function(currentnum){
+      let tempList =[];
+      let answer1 =this.currentListData[currentnum].answer.replace(/，/g,",");
+      let answerList =answer1.split(",");
+      answerList.forEach(element => {
+          let answer=element.toUpperCase();
+          if(answer =="A"){
+            tempList.push(0);
+          }else if(answer =="B"){
+             tempList.push(1);
+          }else if(answer =="C"){
+             tempList.push(2);
+          }else if(answer =="D"){
+             tempList.push(3);
+          }
+        
+      });
+      return tempList;
+      
     },
 
-    select: function (value) {
-      this.answer = value;
-    },
+
 
     //确认校验
     truebutton: function () {
-      var userAnswer = this.answer;
-      var reAnswer = this.an.answer;
-
+      var userAnswer = this.checkList;      //用户输入的答案集合
+      var reAnswer = this.an.answer;        //传入的正确答案
       //保证重新开始，错误题目回顾
           if((this.currenQuestion + 1)==1){
             this.falseTitel=[];
           }
 
-      if(this.answer !=5){
-        if (userAnswer == reAnswer) {
-        this.radiograde++;
-        }else{
-        this.falseTitel.push(this.currentListData[this.currenQuestion]);
-        }
+      let result =this.JudgeResult(userAnswer,reAnswer);
+      if(this.checkList.length >0){
+          if (result) {
+            this.radiograde++;
+          }else{
+            this.getDatas();
+            let temp = this.potanswer(this.currenQuestion);
+            let temptitle =this.currentListData[this.currenQuestion].title;
+            let tempselect =this.currentoption;
+           this.falseTitel.push({title:temptitle,option:tempselect,answer:temp});
+          }
       }
-
       if (this.currenQuestion < this.totle - 1) {
-        if (this.answer != 5) {
+        if (this.checkList.length > 0) {
           this.currenQuestion = this.currenQuestion + 1;
           this.getDatas();
           this.reGo();
@@ -191,12 +232,14 @@ export default {
     },
     //初始化
     reGo: function () {
-      this.answer = 5;
+    //   this.answer = 5;
+    this.currentAnswer=[];
+      this.checkList=[];
       this.radio = 5;
     },
     //重新开始答题
     AllRegame: function () {
-      this.currentListData = this.getRandomTitle(listData, this.count);
+      this.currentListData = this.getRandomTitle(this.listData, this.count);
       this.reGo();
       this.currenQuestion = 0;
       this.totle = 0;
@@ -207,6 +250,7 @@ export default {
 
     //在传入的数据当中随机取出n条
     getRandomTitle: function (arr, count) {
+      if(this.listData.length!=0){
       var newList = [];
       var List = arr.slice(0);
       var i = arr.length;
@@ -222,9 +266,11 @@ export default {
         }
       }
       return newList;
+      }
     },
     //查看答案
     getCurrentAnswer: function () {
+        this.getAnswer();
         this.answerDialogVisible =true;
 
     },
@@ -246,10 +292,41 @@ export default {
       this.falseDialogVisible = false;
       this.AllRegame();
     },
+
+    //判断结果集是否正确，数组和答案相同返回ture，否则返回false
+    JudgeResult: function(arr1,arr2){
+        /**
+         * param : arr1: 用户选择的答案集合
+         * param : arr2: 数据中标准的答案集合
+         * result : 返回结果，用户选择答案全对，返回true,否则，返回false
+         */
+        for(let i=0;i<=arr2.length-1;i++){
+            if(arr1.indexOf(arr2[i])== -1){
+                return  false;
+            }else if(arr1.length!=arr2.length){
+                return false;
+            }
+        }
+        return true;
+    },
+
+    //获取当前题目答案
+    getAnswer: function(){
+      let tempArray=[];
+        this.an.answer.forEach( i => {
+           tempArray.push("    "+this.an.option[i]+"   ");
+        });
+        let result =this.JudgeResult(tempArray,this.currentAnswer);
+        if(result){
+          this.currentAnswer.push(tempArray);
+        }
+        return;
+    },
     //关闭窗口重新开始
     closeback:function(){
       this.AllRegame();
     }
+
 
   },
     computed:{

@@ -1,6 +1,6 @@
 <template>
   <div class="bigdiv">
-    <h3>测试</h3><span>{{getCurrentTime}}</span>
+    <h3>简易小题库</h3><span>{{getCurrentTime}}</span>
     <el-card>
       <el-container>
         <el-header>
@@ -73,8 +73,8 @@
           选项：<br/>
           A.正确<br/>
           B.错误<br/>
-          答案 : <span style="color:red" v-if="item.answer ==0">A、正确<br/></span>
-                <span style="color:red" v-else-if="item.answer==1">B、错误<br/></span>  
+          答案 : <span style="color:red" v-if="item.answer =='A'">A、正确<br/></span>
+                <span style="color:red" v-else-if="item.answer=='B'">B、错误<br/></span>  
           <br/>
           <br/>
         </div>
@@ -87,7 +87,7 @@
   </div>
 </template>
 <script>
-import {listData} from '../datas/Data3'
+// import {listData} from '../datas/Data3'
 
 export default {
   data() {
@@ -126,7 +126,10 @@ export default {
     };
   },
   created() {
-    this.currentListData = this.getRandomTitle(listData, this.count);
+    this.listData=this.$store.state.usertitle.judgeList;   //添加
+    this.count=this.$store.state.checkbox.judgecount;
+    this.noneListWarn();
+    this.currentListData = this.getRandomTitle(this.listData, this.count);
     this.getDatas();
 
      var that =this;
@@ -135,15 +138,41 @@ export default {
         },1000)
   },
   methods: {
+     //未上传题库
+    noneListWarn: function(){
+      if(this.listData.length==0){
+        alert('请添加判断题库哦');
+        this.$router.push("/index");
+        return;
+      }
+    },
+
+
     getDatas: async function () {
+      if(this.listData.length!=0){
+
+     
       //获取题数变化
       var currentnum = this.currenQuestion;
       this.an.title = this.currentListData[currentnum].title;
-    //   this.an.option = this.currentListData[currentnum].option;
-      this.an.answer = this.currentListData[currentnum].answer;
+      this.an.answer =this.potanswer(currentnum);
       //获取总提数
       this.totle = this.currentListData.length;
+       }
     },
+    //封装答案
+    potanswer: function(currentnum){
+      let answer1 =this.currentListData[currentnum].answer;
+      let answer=answer1.toUpperCase();
+      if(answer =="A"){
+        return 0;
+      }else if(answer =="B"){
+        return 1;
+      }   
+    },
+
+
+
     //确认校验
     truebutton: function () {
       var userAnswer =parseInt(this.answer);      //用户输入的答案集合
@@ -158,7 +187,9 @@ export default {
           if (userAnswer == reAnswer) {
             this.radiograde++;
             }else{
-              
+              // console.log(this.an);
+              // this.falseTitel.push(this.an);
+              console.log(this.currentListData)
             this.falseTitel.push(this.currentListData[this.currenQuestion]);
              }
       }
@@ -191,7 +222,7 @@ export default {
     },
     //重新开始答题
     AllRegame: function () {
-      this.currentListData = this.getRandomTitle(listData, this.count);
+      this.currentListData = this.getRandomTitle(this.listData, this.count);
       this.reGo();
       this.currenQuestion = 0;
       this.totle = 0;
@@ -202,6 +233,8 @@ export default {
 
     //在传入的数据当中随机取出n条
     getRandomTitle: function (arr, count) {
+      if(this.listData.length!=0){
+
       var newList = [];
       var List = arr.slice(0);
       var i = arr.length;
@@ -217,6 +250,7 @@ export default {
         }
       }
       return newList;
+      }
     },
     //查看答案
     getCurrentAnswer: function () {
